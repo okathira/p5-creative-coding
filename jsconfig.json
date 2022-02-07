@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": true,
+    "noEmit": true,
+    "strict": true,
+    "module": "commonJS",
+    "target": "es6",
+    "types": [
+      "p5/global"
+    ]
+  }
+}

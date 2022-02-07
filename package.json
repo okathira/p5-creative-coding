@@ -1,0 +1,10 @@
+{
+  "name": "p5-art",
+  "version": "1.0.0",
+  "author": "okathira <43328895+okathira@users.noreply.github.com>",
+  "license": "MIT",
+  "private": true,
+  "devDependencies": {
+    "@types/p5": "^1.4.0"
+  }
+}

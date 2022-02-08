@@ -26,8 +26,8 @@ const refreshTerrain = () => {
         noise((x - wave) * NOISE_SCALE, y * NOISE_SCALE),
         0,
         1,
-        -100,
-        200
+        -150,
+        150
       );
     }
   }
@@ -35,13 +35,14 @@ const refreshTerrain = () => {
 
 // 三角を六角形に見えるように並べる（四角形ではなく）
 const drawGrid = (/** @type {number} */ x, /** @type {number} */ y) => {
-  const adjTop = y % 2 ? -0.25 : 0.25;
-  const adjBtm = y % 2 ? 0.25 : -0.25;
-
   if (y % 2) {
+    const adjTop = -0.25;
+    const adjBtm = 0.25;
     vertex((x + adjTop) * SIZE_X, y * SIZE_Y, terrain[y][x]);
     vertex((x + adjBtm) * SIZE_X, (y + 1) * SIZE_Y, terrain[y + 1][x]);
   } else {
+    const adjTop = 0.25;
+    const adjBtm = -0.25;
     vertex((x + adjBtm) * SIZE_X, (y + 1) * SIZE_Y, terrain[y + 1][x]);
     vertex((x + adjTop) * SIZE_X, y * SIZE_Y, terrain[y][x]);
   }
@@ -58,11 +59,11 @@ const drawTerrain = () => {
 };
 
 function draw() {
-  background(0);
+  background(180, 100, 160);
+
   rotateX((PI / 180) * 60);
   rotateZ(PI / 2);
   translate(-w / 2, -h / 2);
-
   refreshTerrain();
   drawTerrain();
 }

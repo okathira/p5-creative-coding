@@ -1,11 +1,11 @@
 const SIZE_X = 40;
 const SIZE_Y = 30;
-const w = 1200;
-const h = 1000;
+const w = 1000;
+const h = 1200;
 const cols = Math.floor(w / SIZE_X);
 const rows = Math.floor(h / SIZE_Y);
 
-const NOISE_SCALE = 0.15;
+const NOISE_SCALE = 0.125;
 
 /** @type {number[][]} */
 let terrain = Array.from({ length: rows + 1 }, () => Array(cols).fill(0));
@@ -19,11 +19,11 @@ function setup() {
 }
 
 const refreshTerrain = () => {
-  wave += 0.1;
+  wave += 0.15;
   for (let y = 0; y < rows + 1; y++) {
     for (let x = 0; x < cols; x++) {
       terrain[y][x] = map(
-        noise(x * NOISE_SCALE, (y - wave) * NOISE_SCALE),
+        noise((x - wave) * NOISE_SCALE, y * NOISE_SCALE),
         0,
         1,
         -100,
@@ -60,6 +60,7 @@ const drawTerrain = () => {
 function draw() {
   background(0);
   rotateX((PI / 180) * 60);
+  rotateZ(PI / 2);
   translate(-w / 2, -h / 2);
 
   refreshTerrain();

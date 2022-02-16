@@ -86,7 +86,7 @@ const clearCanvas = () => {
 
 function mousePressed() {
   // isClicked = true;
-  waveSpeed = 1;
+  waveSpeed = -0.75;
 }
 
 function mouseReleased() {

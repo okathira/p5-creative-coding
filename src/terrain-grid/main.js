@@ -10,6 +10,8 @@ const NOISE_SCALE = 0.15;
 /** @type {number[][]} */
 let terrain = Array.from({ length: rows + 1 }, () => Array(cols).fill(0));
 let wave = 0;
+let waveSpeed = 0.5;
+let isClicked = false;
 
 function setup() {
   // createCanvas(windowWidth, windowHeight, WEBGL);
@@ -20,7 +22,7 @@ function setup() {
 const mid = rows / 2;
 const adjHeight = 450;
 const refreshTerrain = () => {
-  wave += 0.5;
+  wave += waveSpeed;
   for (let y = 0; y < rows + 1; y++) {
     const diff = abs(y - mid);
     const coef = map(diff, 0, mid / 2, 0, 1, true);
@@ -75,16 +77,38 @@ const drawTerrain = () => {
 
 const clearCanvas = () => {
   noStroke();
-  fill(180, 100, 160, 40);
+  fill(180, 100, 160, 50);
   push();
   translate(0, 0, -w * 0.7);
   plane(width * 3.1, height * 3.1);
   pop();
 };
 
+function mousePressed() {
+  // isClicked = true;
+  waveSpeed = 1;
+}
+
+function mouseReleased() {
+  // isClicked = false;
+  waveSpeed = 0.5;
+}
+
+const moveView = () => {
+  if (!isClicked) {
+    const x = map(mouseX, width / 2, width, 0, 1);
+    const y = map(mouseY, height / 2, height, 0, 1);
+
+    translate(x * 100, y * 100);
+    rotateX(y / PI);
+    rotateY(-x / PI);
+  }
+};
+
 function draw() {
   clearCanvas();
 
+  moveView();
   refreshTerrain();
   drawTerrain();
 }

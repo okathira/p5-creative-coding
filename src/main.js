@@ -109,6 +109,7 @@ const TITLE2 = 'OVERDOSE';
 const TITLE_FONT = 'Kanit';
 const TITLE_SIZE = 240;
 const TITLE_WIDTH = 660;
+const STROKE_WEIGHT = 8;
 
 const initTitle = () => {
   // 虹色模様
@@ -129,6 +130,7 @@ const initTitle = () => {
   rainbowCanvas.noStroke();
   rainbowCanvas.rect(0, 0, width, height);
 
+  // 白ドット
   rainbowCanvas.fill('#fffc');
   rainbowCanvas.noStroke();
   for (let x = 0; x < width; x += 8) {
@@ -146,6 +148,7 @@ const initTitle = () => {
   titleCanvas.textAlign(CENTER, CENTER);
   titleCanvas.textFont(TITLE_FONT);
   titleCanvas.textSize(TITLE_SIZE);
+  titleCanvas.strokeWeight(STROKE_WEIGHT + 1);
 };
 
 const drawTitle = () => {
@@ -159,6 +162,22 @@ const drawTitle = () => {
     TITLE_WIDTH
   );
 
+  // 文字を削る
+  titleCanvas.erase();
+  titleCanvas.drawingContext.strokeText(
+    TITLE1,
+    mouseX + STROKE_WEIGHT / 3 - 1,
+    110 + STROKE_WEIGHT - 1,
+    TITLE_WIDTH
+  );
+  titleCanvas.drawingContext.strokeText(
+    TITLE2,
+    width - mouseX + STROKE_WEIGHT / 3 - 1,
+    height - 70 + STROKE_WEIGHT - 1,
+    TITLE_WIDTH
+  );
+  titleCanvas.noErase();
+
   // 文字で虹をマスク
   const titleImg = titleCanvas.get();
   const rainbowImg = rainbowCanvas.get();
@@ -171,8 +190,8 @@ const drawTitle = () => {
   // 輪郭
   push();
 
-  stroke(255);
-  strokeWeight(10);
+  stroke('#fff');
+  strokeWeight(STROKE_WEIGHT);
   textAlign(CENTER, CENTER);
   textFont(TITLE_FONT);
   textSize(TITLE_SIZE);

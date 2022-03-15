@@ -94,15 +94,101 @@ const drawHearts = () => {
   pop();
 };
 
+// rainbow title
+// font: Kanit https://github.com/cadsondemak/kanit/blob/master/OFL.txt
+
+/** @type {{ addColorStop: (arg0: number, arg1: string) => void; }} */
+let rainbow;
+/**  @type {import("p5").Graphics} */
+let rainbowCanvas;
+/**  @type {import("p5").Graphics} */
+let titleCanvas;
+const TITLE1 = 'INTERNET';
+const TITLE2 = 'OVERDOSE';
+const TITLE_FONT = 'Kanit';
+const TITLE_SIZE = 240;
+const TITLE_WIDTH = 660;
+
+const initTitle = () => {
+  // 虹色模様
+  rainbowCanvas = createGraphics(width, height);
+  rainbow = rainbowCanvas.drawingContext.createConicGradient(
+    0,
+    width / 2,
+    height / 2
+  );
+  rainbow.addColorStop(0, '#f00c');
+  rainbow.addColorStop(1 / 6, '#ff0c');
+  rainbow.addColorStop(2 / 6, '#0f0c');
+  rainbow.addColorStop(3 / 6, '#0ffc');
+  rainbow.addColorStop(4 / 6, '#00fc');
+  rainbow.addColorStop(5 / 6, '#f0fc');
+  rainbow.addColorStop(1, '#f00c');
+  rainbowCanvas.drawingContext.fillStyle = rainbow;
+  rainbowCanvas.noStroke();
+  rainbowCanvas.rect(0, 0, width, height);
+
+  rainbowCanvas.fill('#fffc');
+  rainbowCanvas.noStroke();
+  for (let x = 0; x < width; x += 8) {
+    for (let y = 0; y < height; y += 4) {
+      if (y % 8) {
+        rainbowCanvas.ellipse(x, y, 3);
+      } else {
+        rainbowCanvas.ellipse(x + 4, y, 3);
+      }
+    }
+  }
+
+  // 文字マスク
+  titleCanvas = createGraphics(width, height);
+  titleCanvas.textAlign(CENTER, CENTER);
+  titleCanvas.textFont(TITLE_FONT);
+  titleCanvas.textSize(TITLE_SIZE);
+};
+
+const drawTitle = () => {
+  // 文字を描く
+  titleCanvas.clear(0, 0, 0, 0);
+  titleCanvas.drawingContext.fillText(TITLE1, mouseX, 110, TITLE_WIDTH);
+  titleCanvas.drawingContext.fillText(
+    TITLE2,
+    width - mouseX,
+    height - 70,
+    TITLE_WIDTH
+  );
+
+  // 文字で虹をマスク
+  const titleImg = titleCanvas.get();
+  const rainbowImg = rainbowCanvas.get();
+  rainbowImg.mask(titleImg);
+  image(rainbowImg, 0, 0);
+
+  // 輪郭
+  push();
+
+  stroke(255);
+  strokeWeight(10);
+  textAlign(CENTER, CENTER);
+  textFont(TITLE_FONT);
+  textSize(TITLE_SIZE);
+  drawingContext.strokeText(TITLE1, mouseX, 110, TITLE_WIDTH);
+  drawingContext.strokeText(TITLE2, width - mouseX, height - 70, TITLE_WIDTH);
+
+  pop();
+};
+
 function setup() {
   frameRate(60);
   createCanvas(720, 540);
 
   initHearts();
+  initTitle();
 }
 
 function draw() {
   background(60, 120, 180);
 
   drawHearts();
+  drawTitle();
 }

@@ -1,4 +1,7 @@
 // inspired by: INTERNET OVERDOSE https://www.youtube.com/watch?v=Ti4K8uuiLZ0
+// NEEDY GIRL OVERDOSE https://store.steampowered.com/app/1451940/NEEDY_GIRL_OVERDOSE
+//
+// set pic.png, room.psd -> room.png
 
 // heart bubble
 // reference: p5.js　バブルアップ - techtyの日記 https://techty.hatenablog.com/entry/2019/05/07/164956
@@ -111,7 +114,7 @@ const TITLE_SIZE = 240;
 const TITLE_WIDTH = 660;
 const STROKE_WEIGHT = 8;
 
-const initTitle = () => {
+const initMain = () => {
   // 虹色模様
   rainbowCanvas = createGraphics(width, height);
   rainbow = rainbowCanvas.drawingContext.createConicGradient(
@@ -151,8 +154,8 @@ const initTitle = () => {
   titleCanvas.strokeWeight(STROKE_WEIGHT + 1);
 };
 
-const drawTitle = () => {
-  // 文字を描く
+const drawMain = () => {
+  // 文字を作る
   titleCanvas.clear(0, 0, 0, 0);
   titleCanvas.drawingContext.fillText(TITLE1, mouseX, 110, TITLE_WIDTH);
   titleCanvas.drawingContext.fillText(
@@ -182,12 +185,8 @@ const drawTitle = () => {
   const titleImg = titleCanvas.get();
   const rainbowImg = rainbowCanvas.get();
   rainbowImg.mask(titleImg);
-  push();
-  blendMode(HARD_LIGHT);
-  image(rainbowImg, 0, 0);
-  pop();
 
-  // 輪郭
+  // タイトルと画像を描画
   push();
 
   stroke('#fff');
@@ -195,31 +194,55 @@ const drawTitle = () => {
   textAlign(CENTER, CENTER);
   textFont(TITLE_FONT);
   textSize(TITLE_SIZE);
+
+  // タイトル上
+  push();
+  blendMode(HARD_LIGHT);
+  image(rainbowImg, 0, 0, width, height / 2, 0, 0, width, height / 2);
+  pop();
   drawingContext.strokeText(TITLE1, mouseX, 110, TITLE_WIDTH);
+
+  // 画像
+  push();
+  imageMode(CENTER);
+  image(pic, width / 2, height / 2 - 20);
+  pop();
+
+  // タイトル下
+  push();
+  blendMode(HARD_LIGHT);
+  image(rainbowImg, 0, height / 2, width, height, 0, height / 2, width, height);
+  pop();
   drawingContext.strokeText(TITLE2, width - mouseX, height - 70, TITLE_WIDTH);
 
   pop();
 };
 
-// /**  @type {import("p5").Image} */
-// let img;
-// function preload() {
-//   img = loadImage('bg.jpg');
-// }
+// 画像
+/**  @type {import("p5").Image} */
+let room;
+/**  @type {import("p5").Image} */
+let pic;
+
+function preload() {
+  room = loadImage('room.png');
+  pic = loadImage('pic.png');
+}
 
 function setup() {
   frameRate(60);
   createCanvas(720, 540);
-  // img.resize(width, (img.height * width) / img.width);
+
+  room.resize((room.width * height) / room.height, height);
+  pic.resize(pic.width * 0.625, pic.height * 0.625);
 
   initHearts();
-  initTitle();
+  initMain();
 }
 
 function draw() {
-  background(60, 120, 180);
-  // image(img, 0, -200);
+  image(room, 0, 0);
 
   drawHearts();
-  drawTitle();
+  drawMain();
 }

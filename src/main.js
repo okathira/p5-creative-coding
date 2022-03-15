@@ -86,6 +86,7 @@ const drawHearts = () => {
   textAlign(CENTER, CENTER);
   strokeWeight(0);
 
+  blendMode(HARD_LIGHT);
   hearts.forEach((heart) => {
     heart.update();
     heart.draw();
@@ -162,7 +163,10 @@ const drawTitle = () => {
   const titleImg = titleCanvas.get();
   const rainbowImg = rainbowCanvas.get();
   rainbowImg.mask(titleImg);
+  push();
+  blendMode(HARD_LIGHT);
   image(rainbowImg, 0, 0);
+  pop();
 
   // 輪郭
   push();
@@ -178,9 +182,16 @@ const drawTitle = () => {
   pop();
 };
 
+// /**  @type {import("p5").Image} */
+// let img;
+// function preload() {
+//   img = loadImage('bg.jpg');
+// }
+
 function setup() {
   frameRate(60);
   createCanvas(720, 540);
+  // img.resize(width, (img.height * width) / img.width);
 
   initHearts();
   initTitle();
@@ -188,6 +199,7 @@ function setup() {
 
 function draw() {
   background(60, 120, 180);
+  // image(img, 0, -200);
 
   drawHearts();
   drawTitle();

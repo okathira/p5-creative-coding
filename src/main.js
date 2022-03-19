@@ -101,81 +101,64 @@ const drawHearts = () => {
 // rainbow title
 // font: Kanit https://github.com/cadsondemak/kanit/blob/master/OFL.txt
 
-/** @type {{ addColorStop: (arg0: number, arg1: string) => void; }} */
-let rainbow;
 /**  @type {import("p5").Graphics} */
-let rainbowCanvas;
-/**  @type {import("p5").Graphics} */
-let titleCanvas;
+let dotCanvas;
+/** @type {import("p5").Image} */
+let titleFillImg;
 const TITLE1 = 'INTERNET';
 const TITLE2 = "DON'DOSE";
 const TITLE_FONT = 'Kanit';
 const TITLE_SIZE = 240;
 const TITLE_WIDTH = 660;
 const STROKE_WEIGHT = 8;
+/** @type {number} */
+let MID_X;
+/** @type {number} */
+let MID_Y;
 
 const initMain = () => {
+  MID_X = width / 2;
+  MID_Y = height / 2;
+
   // 虹色模様
-  rainbowCanvas = createGraphics(width, height);
-  rainbow = rainbowCanvas.drawingContext.createConicGradient(
+  const rainbowCanvas = createGraphics(width, height);
+  const rainbow = rainbowCanvas.drawingContext.createConicGradient(
     0,
-    width / 2,
-    height / 2
+    MID_X,
+    MID_Y
   );
-  rainbow.addColorStop(0, '#f00c');
-  rainbow.addColorStop(1 / 6, '#ff0c');
-  rainbow.addColorStop(2 / 6, '#0f0c');
-  rainbow.addColorStop(3 / 6, '#0ffc');
-  rainbow.addColorStop(4 / 6, '#00fc');
-  rainbow.addColorStop(5 / 6, '#f0fc');
-  rainbow.addColorStop(1, '#f00c');
+  rainbow.addColorStop(0, '#f00d');
+  rainbow.addColorStop(1 / 6, '#ff0d');
+  rainbow.addColorStop(2 / 6, '#0f0d');
+  rainbow.addColorStop(3 / 6, '#0ffd');
+  rainbow.addColorStop(4 / 6, '#00fd');
+  rainbow.addColorStop(5 / 6, '#f0fd');
+  rainbow.addColorStop(1, '#f00d');
   rainbowCanvas.drawingContext.fillStyle = rainbow;
   rainbowCanvas.noStroke();
   rainbowCanvas.rect(0, 0, width, height);
 
-  // 白ドット
-  rainbowCanvas.fill('#fffc');
-  rainbowCanvas.noStroke();
-  for (let x = 0; x < width; x += 8) {
-    for (let y = 0; y < height; y += 4) {
-      if (y % 8) {
-        rainbowCanvas.ellipse(x, y, 3);
-      } else {
-        rainbowCanvas.ellipse(x + 4, y, 3);
-      }
-    }
-  }
-
-  // 文字マスク
-  titleCanvas = createGraphics(width, height);
+  // 文字を作る
+  const titleCanvas = createGraphics(width, height);
   titleCanvas.textAlign(CENTER, CENTER);
   titleCanvas.textFont(TITLE_FONT);
   titleCanvas.textSize(TITLE_SIZE);
   titleCanvas.strokeWeight(STROKE_WEIGHT + 1);
-};
-
-const drawMain = () => {
-  // 文字を作る
-  titleCanvas.clear(0, 0, 0, 0);
-  titleCanvas.drawingContext.fillText(TITLE1, mouseX, 110, TITLE_WIDTH);
-  titleCanvas.drawingContext.fillText(
-    TITLE2,
-    width - mouseX,
-    height - 70,
-    TITLE_WIDTH
-  );
+  // titleCanvas.clear(0, 0, 0, 0);
+  titleCanvas.drawingContext.fillText(TITLE1, MID_X, 110, TITLE_WIDTH);
+  titleCanvas.drawingContext.fillText(TITLE2, MID_X, height - 70, TITLE_WIDTH);
 
   // 文字を削る
   titleCanvas.erase();
   titleCanvas.drawingContext.strokeText(
     TITLE1,
-    mouseX + STROKE_WEIGHT / 3 - 1,
+    MID_X + STROKE_WEIGHT / 3 - 1,
     110 + STROKE_WEIGHT - 1,
     TITLE_WIDTH
   );
   titleCanvas.drawingContext.strokeText(
     TITLE2,
-    width - mouseX + STROKE_WEIGHT / 3 - 1,
+    MID_X + STROKE_WEIGHT / 3 - 1,
     height - 70 + STROKE_WEIGHT - 1,
     TITLE_WIDTH
   );
@@ -185,33 +168,86 @@ const drawMain = () => {
   const titleImg = titleCanvas.get();
   const rainbowImg = rainbowCanvas.get();
   rainbowImg.mask(titleImg);
+  titleFillImg = rainbowImg;
 
+  // 白ドット
+  dotCanvas = createGraphics(width, height);
+  dotCanvas.fill('#fff');
+  dotCanvas.noStroke();
+  for (let x = 0; x < width; x += 8) {
+    for (let y = 0; y < height; y += 4) {
+      if (y % 8) {
+        dotCanvas.ellipse(x, y, 3.25);
+      } else {
+        dotCanvas.ellipse(x + 4, y, 3.25);
+      }
+    }
+  }
+
+  // 不要なキャンバスを削除
+  titleCanvas.remove();
+  rainbowCanvas.remove();
+};
+
+const drawMain = () => {
   // タイトルと画像を描画
   push();
 
+  // stroke設定
   stroke('#fff');
   strokeWeight(STROKE_WEIGHT);
   textAlign(CENTER, CENTER);
   textFont(TITLE_FONT);
   textSize(TITLE_SIZE);
 
+  // タイトルを描画位置に用意する
+  const displayedTitleImg = createImage(width, height);
+  displayedTitleImg.copy(
+    titleFillImg,
+    0,
+    0,
+    width,
+    MID_Y,
+    -MID_X + mouseX,
+    0,
+    width,
+    MID_Y
+  );
+  displayedTitleImg.copy(
+    titleFillImg,
+    0,
+    MID_Y,
+    width,
+    height,
+    MID_X - mouseX,
+    MID_Y,
+    width,
+    height
+  );
+
+  // ドットを描画位置に用意する
+  const dotImg = dotCanvas.get();
+  dotImg.mask(displayedTitleImg);
+
   // タイトル上
   push();
   blendMode(HARD_LIGHT);
-  image(rainbowImg, 0, 0, width, height / 2, 0, 0, width, height / 2);
+  image(displayedTitleImg, 0, 0, width, MID_Y, 0, 0, width, MID_Y);
+  image(dotImg, 0, 0, width, MID_Y, 0, 0, width, MID_Y);
   pop();
   drawingContext.strokeText(TITLE1, mouseX, 110, TITLE_WIDTH);
 
   // 画像
   push();
   imageMode(CENTER);
-  image(pic, width / 2, height / 2 - 20);
+  image(pic, MID_X, MID_Y - 20);
   pop();
 
   // タイトル下
   push();
   blendMode(HARD_LIGHT);
-  image(rainbowImg, 0, height / 2, width, height, 0, height / 2, width, height);
+  image(displayedTitleImg, 0, MID_Y, width, height, 0, MID_Y, width, height);
+  image(dotImg, 0, MID_Y, width, height, 0, MID_Y, width, height);
   pop();
   drawingContext.strokeText(TITLE2, width - mouseX, height - 70, TITLE_WIDTH);
 

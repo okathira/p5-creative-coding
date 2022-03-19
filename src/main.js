@@ -9,8 +9,8 @@
 class HeartBubble {
   static SIZE_MAX = 90;
   static SIZE_MIN = 20;
-  static SIZE_NUM = 40;
-  static TRANSPERENT = 192;
+  static SIZE_NUM = 50;
+  static TRANSPERENT = 224;
   static COLOR = [
     [255, 255, 127, HeartBubble.TRANSPERENT],
     [127, 255, 255, HeartBubble.TRANSPERENT],
@@ -108,7 +108,7 @@ let rainbowCanvas;
 /**  @type {import("p5").Graphics} */
 let titleCanvas;
 const TITLE1 = 'INTERNET';
-const TITLE2 = 'OVERDOSE';
+const TITLE2 = "DON'DOSE";
 const TITLE_FONT = 'Kanit';
 const TITLE_SIZE = 240;
 const TITLE_WIDTH = 660;
@@ -225,8 +225,30 @@ let room;
 let pic;
 
 function preload() {
-  room = loadImage('room.png');
+  room = loadImage('room.png'); // loadImage('https://pbs.twimg.com/media/FL9W_EQaQAIegtS?format=jpg'); // see https://twitter.com/infowssJP/status/1495276417390907395
   pic = loadImage('pic.png');
+}
+
+// クリック判定
+let isMousePressed = false;
+
+function mousePressed() {
+  isMousePressed = true;
+}
+
+function mouseReleased() {
+  isMousePressed = false;
+}
+
+// キー判定
+let anyKeyPressed = false;
+
+function keyPressed() {
+  anyKeyPressed = true;
+}
+
+function keyReleased() {
+  anyKeyPressed = false;
 }
 
 function setup() {
@@ -243,6 +265,9 @@ function setup() {
 function draw() {
   image(room, 0, 0);
 
-  drawHearts();
-  drawMain();
+  if (isMousePressed || anyKeyPressed) {
+    // なにか押すと表示
+    drawHearts();
+    drawMain();
+  }
 }

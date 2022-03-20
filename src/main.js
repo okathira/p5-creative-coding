@@ -1,7 +1,7 @@
 // inspired by: INTERNET OVERDOSE https://www.youtube.com/watch?v=Ti4K8uuiLZ0
 // NEEDY GIRL OVERDOSE https://store.steampowered.com/app/1451940/NEEDY_GIRL_OVERDOSE
 //
-// set pic.png, room.psd -> room.png
+// set pic.png, ring.png, room.psd -> room.png
 
 // heart bubble
 // reference: p5.js　バブルアップ - techtyの日記 https://techty.hatenablog.com/entry/2019/05/07/164956
@@ -240,7 +240,10 @@ const drawMain = () => {
   // 画像
   push();
   imageMode(CENTER);
-  image(pic, MID_X, MID_Y - 20);
+  translate(MID_X, MID_Y - 10);
+  image(pic, 0, 0);
+  rotate(-frameCount / 100);
+  image(ring, 0, 0);
   pop();
 
   // タイトル下
@@ -259,10 +262,13 @@ const drawMain = () => {
 let room;
 /**  @type {import("p5").Image} */
 let pic;
+/**  @type {import("p5").Image} */
+let ring;
 
 function preload() {
   room = loadImage('room.png'); // loadImage('https://pbs.twimg.com/media/FL9W_EQaQAIegtS?format=jpg'); // see https://twitter.com/infowssJP/status/1495276417390907395
-  pic = loadImage('pic.png');
+  pic = loadImage('pic.png'); // インターネットやめろジェネレーター @inonote https://inonote.jp/generator/yamero/ 使用書體 M+ Rounded 1c
+  ring = loadImage('ring.png'); // 文字盤
 }
 
 // クリック判定
@@ -291,8 +297,9 @@ function setup() {
   frameRate(60);
   createCanvas(720, 540);
 
-  room.resize((room.width * height) / room.height, height);
+  room.resize((room.width * height) / room.height, height); // width, (room.height * width) / room.width;
   pic.resize(pic.width * 0.625, pic.height * 0.625);
+  ring.resize(ring.width * 0.625, ring.height * 0.625);
 
   initHearts();
   initMain();

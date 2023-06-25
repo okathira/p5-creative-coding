@@ -298,17 +298,28 @@ function setup() {
   createCanvas(720, 540);
 
   room.resize((room.width * height) / room.height, height); // width, (room.height * width) / room.width;
-  pic.resize(pic.width * 0.625, pic.height * 0.625);
-  ring.resize(ring.width * 0.625, ring.height * 0.625);
+  const picRatio = 0.625;
+  pic.resize(pic.width * picRatio, pic.height * picRatio);
+  ring.resize(ring.width * picRatio, ring.height * picRatio);
 
   initHearts();
   initMain();
+
+  // fontの読み込みのため一瞬描画しておく
+  drawMain();
 }
+
+let hasInitialized = false;
 
 function draw() {
   image(room, 0, 0);
 
   if (isMousePressed || anyKeyPressed) {
+    if (!hasInitialized) {
+      initMain(); // 再度フォントを読み込みなおすため
+      hasInitialized = true;
+    }
+
     // なにか押すと表示
     drawHearts();
     drawMain();

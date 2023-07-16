@@ -10,12 +10,12 @@ class HeartBubble {
   static SIZE_MAX = 90;
   static SIZE_MIN = 20;
   static SIZE_NUM = 50;
-  static TRANSPERENT = 224;
+  static TRANSPARENT = 224;
   static COLOR = [
-    [255, 255, 127, HeartBubble.TRANSPERENT],
-    [127, 255, 255, HeartBubble.TRANSPERENT],
-    [255, 127, 255, HeartBubble.TRANSPERENT],
-    [255, 255, 255, HeartBubble.TRANSPERENT],
+    [255, 255, 127, HeartBubble.TRANSPARENT],
+    [127, 255, 255, HeartBubble.TRANSPARENT],
+    [255, 127, 255, HeartBubble.TRANSPARENT],
+    [255, 255, 255, HeartBubble.TRANSPARENT],
   ];
 
   constructor() {

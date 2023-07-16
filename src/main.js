@@ -295,7 +295,8 @@ function keyReleased() {
 
 function setup() {
   frameRate(60);
-  createCanvas(720, 540);
+  const mainCanvas = createCanvas(720, 540);
+  mainCanvas.parent('main');
 
   room.resize((room.width * height) / room.height, height); // width, (room.height * width) / room.width;
   const picRatio = 0.625;
@@ -304,9 +305,6 @@ function setup() {
 
   initHearts();
   initMain();
-
-  // fontの読み込みのため一瞬描画しておく
-  drawMain();
 }
 
 let hasInitialized = false;

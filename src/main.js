@@ -6,6 +6,8 @@
 // heart bubble
 // reference: p5.js　バブルアップ - techtyの日記 https://techty.hatenablog.com/entry/2019/05/07/164956
 
+const FPS = 30;
+
 class HeartBubble {
   static SIZE_MAX = 90;
   static SIZE_MIN = 20;
@@ -35,14 +37,14 @@ class HeartBubble {
   }
 
   update() {
-    this.speedX += random(-0.5, 0.5);
+    this.speedX = this.speedX + random(-0.5, 0.5);
     this.speedX = constrain(this.speedX, -2, 2);
-    this.x += this.speedX;
-    this.y += this.speedY;
+    this.x += (this.speedX * 60) / FPS;
+    this.y += (this.speedY * 60) / FPS;
 
     // 色変化
-    if (frameCount % 2) {
-      this.color += int(random(1, HeartBubble.COLOR.length));
+    if (!(frameCount % 2)) {
+      this.color += int(random(0, HeartBubble.COLOR.length));
       this.color %= HeartBubble.COLOR.length;
     }
 
@@ -242,7 +244,7 @@ const drawMain = () => {
   imageMode(CENTER);
   translate(MID_X, MID_Y - 10);
   image(pic, 0, 0);
-  rotate(-frameCount / 100);
+  rotate((-frameCount * 0.01 * 60) / FPS);
   image(ring, 0, 0);
   pop();
 
@@ -294,7 +296,7 @@ function keyReleased() {
 }
 
 function setup() {
-  frameRate(60);
+  frameRate(FPS);
   const mainCanvas = createCanvas(720, 540);
   mainCanvas.parent('main');
 

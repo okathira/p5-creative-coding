@@ -195,7 +195,7 @@ const initMain = () => {
   titleFillImg = rainbowImg;
 
   // 白ドット
-  dotCanvas = createGraphics(width, height);
+  dotCanvas = createGraphics(width, centerY);
   dotCanvas.fill('#fff');
   dotCanvas.noStroke();
   for (let x = 0; x < width; x += 8) {
@@ -222,7 +222,7 @@ const initMain = () => {
  * @param {number} offsetX
  */
 const drawTitleImg = (titleImg, x, y, w, h, offsetX) => {
-  titleImg.copy(titleFillImg, x, y, w, h, offsetX, y, w, h);
+  titleImg.copy(titleFillImg, x, y, w, h, offsetX, 0, w, h);
 };
 
 /** 文字のドット画像を生成する
@@ -231,16 +231,14 @@ const drawTitleImg = (titleImg, x, y, w, h, offsetX) => {
  */
 const createTitleDotImg = (titleImg) => {
   const titleDotImg = dotCanvas.get();
-  titleDotImg.mask(titleImg);
+  titleDotImg.mask(titleImg); // TODO: 重そうなのでいい方法を考える
 
   return titleDotImg;
 };
 
-//  TODO:  titleImgとtitleDotImgを渡さず、この関数の中で完結できると嬉しい
+//  TODO:  画像のコピーに必要な座標とテキストの描画に必要な座標とで、２つの座標が存在してしまっているのをなおす。
 /** タイトルを描画する
  * @param {string} titleText
- * @param {import("p5").Image} titleImg
- * @param {import("p5").Image} titleDotImg
  * @param {number} x
  * @param {number} y
  * @param {number} w
@@ -248,21 +246,21 @@ const createTitleDotImg = (titleImg) => {
  * @param {number} textX
  * @param {number} textY
  */
-const drawTitle = (
-  titleText,
-  titleImg,
-  titleDotImg,
-  x,
-  y,
-  w,
-  h,
-  textX,
-  textY
-) => {
+const drawTitle = (titleText, x, y, w, h, textX, textY) => {
+  const centerX = w / 2;
+
+  // タイトルを書くための画像データを作成する
+  const titleImg = createImage(w, h);
+  // 画像にタイトルを書き込む
+  drawTitleImg(titleImg, x, y, w, h, textX - centerX);
+  // タイトルのドット画像を生成する
+  const titleDotImg = createTitleDotImg(titleImg);
+  // TODO: ここまでの処理を効率化できないか考える
+
   push();
   blendMode(HARD_LIGHT);
-  image(titleImg, x, y, w, h, x, y, w, h);
-  image(titleDotImg, x, y, w, h, x, y, w, h);
+  image(titleImg, x, y, w, h, 0, 0, w, h);
+  image(titleDotImg, x, y, w, h, 0, 0, w, h);
   pop();
   drawingContext.strokeText(titleText, textX, textY, TITLE_WIDTH);
 };
@@ -297,28 +295,8 @@ const drawMain = () => {
   textFont(TITLE_FONT);
   textSize(TITLE_SIZE);
 
-  const titleImg = createImage(width, height);
-
   // タイトル上部
-  drawTitleImg(titleImg, 0, 0, width, centerY, -centerX + mouseX);
-  // タイトル下部
-  drawTitleImg(titleImg, 0, centerY, width, centerY, centerX - mouseX);
-
-  // dot画像を生成
-  const titleDotImg = createTitleDotImg(titleImg);
-
-  // タイトル上部
-  drawTitle(
-    TITLE1,
-    titleImg,
-    titleDotImg,
-    0,
-    0,
-    width,
-    centerY,
-    mouseX,
-    UPPER_OFFSET_Y
-  );
+  drawTitle(TITLE1, 0, 0, width, centerY, mouseX, UPPER_OFFSET_Y);
 
   // 中央のコンテンツ
   drawCenterContent(centerX, centerY - 10, (-frameCount * 0.01 * 60) / FPS);
@@ -326,8 +304,6 @@ const drawMain = () => {
   // タイトル下部
   drawTitle(
     TITLE2,
-    titleImg,
-    titleDotImg,
     0,
     centerY,
     width,

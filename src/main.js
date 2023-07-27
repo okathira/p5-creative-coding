@@ -3,10 +3,10 @@
 //
 // set pic.png, ring.png, room.psd -> room.png
 
+const FPS = 30;
+
 // heart bubble
 // reference: p5.js　バブルアップ - techtyの日記 https://techty.hatenablog.com/entry/2019/05/07/164956
-
-const FPS = 30;
 
 class HeartBubble {
   static SIZE_MAX = 90;
@@ -100,6 +100,20 @@ const drawHearts = () => {
   pop();
 };
 
+// 画像
+/**  @type {import("p5").Image} */
+let room;
+/**  @type {import("p5").Image} */
+let pic;
+/**  @type {import("p5").Image} */
+let ring;
+
+function preload() {
+  room = loadImage('room.png'); // loadImage('https://pbs.twimg.com/media/FL9W_EQaQAIegtS?format=jpg'); // see https://twitter.com/infowssJP/status/1495276417390907395
+  pic = loadImage('pic.png'); // インターネットやめろジェネレーター @inonote https://inonote.jp/generator/yamero/ 使用書體 M+ Rounded 1c
+  ring = loadImage('ring.png'); // 文字盤
+}
+
 // rainbow title
 // font: Kanit https://github.com/cadsondemak/kanit/blob/master/OFL.txt
 
@@ -109,25 +123,23 @@ let dotCanvas;
 let titleFillImg;
 const TITLE1 = 'INTERNET';
 const TITLE2 = "DON'DOSE";
+const UPPER_OFFSET_Y = 110;
+const LOWER_OFFSET_Y = 70;
 const TITLE_FONT = 'Kanit';
 const TITLE_SIZE = 240;
 const TITLE_WIDTH = 660;
 const STROKE_WEIGHT = 8;
-/** @type {number} */
-let MID_X;
-/** @type {number} */
-let MID_Y;
 
 const initMain = () => {
-  MID_X = width / 2;
-  MID_Y = height / 2;
+  const centerX = width / 2;
+  const centerY = height / 2;
 
   // 虹色模様
   const rainbowCanvas = createGraphics(width, height);
   const rainbow = rainbowCanvas.drawingContext.createConicGradient(
     0,
-    MID_X,
-    MID_Y
+    centerX,
+    centerY
   );
   rainbow.addColorStop(0, '#f00d');
   rainbow.addColorStop(1 / 6, '#ff0d');
@@ -147,21 +159,31 @@ const initMain = () => {
   titleCanvas.textSize(TITLE_SIZE);
   titleCanvas.strokeWeight(STROKE_WEIGHT + 1);
   // titleCanvas.clear(0, 0, 0, 0);
-  titleCanvas.drawingContext.fillText(TITLE1, MID_X, 110, TITLE_WIDTH);
-  titleCanvas.drawingContext.fillText(TITLE2, MID_X, height - 70, TITLE_WIDTH);
+  titleCanvas.drawingContext.fillText(
+    TITLE1,
+    centerX,
+    UPPER_OFFSET_Y,
+    TITLE_WIDTH
+  );
+  titleCanvas.drawingContext.fillText(
+    TITLE2,
+    centerX,
+    height - LOWER_OFFSET_Y,
+    TITLE_WIDTH
+  );
 
   // 文字を削る
   titleCanvas.erase();
   titleCanvas.drawingContext.strokeText(
     TITLE1,
-    MID_X + STROKE_WEIGHT / 3 - 1,
-    110 + STROKE_WEIGHT - 1,
+    centerX + STROKE_WEIGHT / 3 - 1,
+    UPPER_OFFSET_Y + STROKE_WEIGHT - 1,
     TITLE_WIDTH
   );
   titleCanvas.drawingContext.strokeText(
     TITLE2,
-    MID_X + STROKE_WEIGHT / 3 - 1,
-    height - 70 + STROKE_WEIGHT - 1,
+    centerX + STROKE_WEIGHT / 3 - 1,
+    height - LOWER_OFFSET_Y + STROKE_WEIGHT - 1,
     TITLE_WIDTH
   );
   titleCanvas.noErase();
@@ -191,7 +213,80 @@ const initMain = () => {
   rainbowCanvas.remove();
 };
 
+/** タイトルを画像に書き込む
+ * @param {import("p5").Image} titleImg
+ * @param {number} x
+ * @param {number} y
+ * @param {number} w
+ * @param {number} h
+ * @param {number} offsetX
+ */
+const drawTitleImg = (titleImg, x, y, w, h, offsetX) => {
+  titleImg.copy(titleFillImg, x, y, w, h, offsetX, y, w, h);
+};
+
+/** 文字のドット画像を生成する
+ * @param {import("p5").Image} titleImg
+ * @returns {import("p5").Image}
+ */
+const createTitleDotImg = (titleImg) => {
+  const titleDotImg = dotCanvas.get();
+  titleDotImg.mask(titleImg);
+
+  return titleDotImg;
+};
+
+//  TODO:  titleImgとtitleDotImgを渡さず、この関数の中で完結できると嬉しい
+/** タイトルを描画する
+ * @param {string} titleText
+ * @param {import("p5").Image} titleImg
+ * @param {import("p5").Image} titleDotImg
+ * @param {number} x
+ * @param {number} y
+ * @param {number} w
+ * @param {number} h
+ * @param {number} textX
+ * @param {number} textY
+ */
+const drawTitle = (
+  titleText,
+  titleImg,
+  titleDotImg,
+  x,
+  y,
+  w,
+  h,
+  textX,
+  textY
+) => {
+  push();
+  blendMode(HARD_LIGHT);
+  image(titleImg, x, y, w, h, x, y, w, h);
+  image(titleDotImg, x, y, w, h, x, y, w, h);
+  pop();
+  drawingContext.strokeText(titleText, textX, textY, TITLE_WIDTH);
+};
+
+/** 中央のコンテンツを描画する
+ * @param {number} x
+ * @param {number} y
+ * @param {number} rad
+ */
+const drawCenterContent = (x, y, rad) => {
+  // 画像
+  push();
+  imageMode(CENTER);
+  translate(x, y);
+  image(pic, 0, 0);
+  rotate(rad);
+  image(ring, 0, 0);
+  pop();
+};
+
 const drawMain = () => {
+  const centerX = width / 2;
+  const centerY = height / 2;
+
   // タイトルと画像を描画
   push();
 
@@ -202,76 +297,47 @@ const drawMain = () => {
   textFont(TITLE_FONT);
   textSize(TITLE_SIZE);
 
-  // タイトルを描画位置に用意する
-  const displayedTitleImg = createImage(width, height);
-  displayedTitleImg.copy(
-    titleFillImg,
+  const titleImg = createImage(width, height);
+
+  // タイトル上部
+  drawTitleImg(titleImg, 0, 0, width, centerY, -centerX + mouseX);
+  // タイトル下部
+  drawTitleImg(titleImg, 0, centerY, width, centerY, centerX - mouseX);
+
+  // dot画像を生成
+  const titleDotImg = createTitleDotImg(titleImg);
+
+  // タイトル上部
+  drawTitle(
+    TITLE1,
+    titleImg,
+    titleDotImg,
     0,
     0,
     width,
-    MID_Y,
-    -MID_X + mouseX,
-    0,
-    width,
-    MID_Y
-  );
-  displayedTitleImg.copy(
-    titleFillImg,
-    0,
-    MID_Y,
-    width,
-    height,
-    MID_X - mouseX,
-    MID_Y,
-    width,
-    height
+    centerY,
+    mouseX,
+    UPPER_OFFSET_Y
   );
 
-  // ドットを描画位置に用意する
-  const dotImg = dotCanvas.get();
-  dotImg.mask(displayedTitleImg);
+  // 中央のコンテンツ
+  drawCenterContent(centerX, centerY - 10, (-frameCount * 0.01 * 60) / FPS);
 
-  // タイトル上
-  push();
-  blendMode(HARD_LIGHT);
-  image(displayedTitleImg, 0, 0, width, MID_Y, 0, 0, width, MID_Y);
-  image(dotImg, 0, 0, width, MID_Y, 0, 0, width, MID_Y);
-  pop();
-  drawingContext.strokeText(TITLE1, mouseX, 110, TITLE_WIDTH);
-
-  // 画像
-  push();
-  imageMode(CENTER);
-  translate(MID_X, MID_Y - 10);
-  image(pic, 0, 0);
-  rotate((-frameCount * 0.01 * 60) / FPS);
-  image(ring, 0, 0);
-  pop();
-
-  // タイトル下
-  push();
-  blendMode(HARD_LIGHT);
-  image(displayedTitleImg, 0, MID_Y, width, height, 0, MID_Y, width, height);
-  image(dotImg, 0, MID_Y, width, height, 0, MID_Y, width, height);
-  pop();
-  drawingContext.strokeText(TITLE2, width - mouseX, height - 70, TITLE_WIDTH);
+  // タイトル下部
+  drawTitle(
+    TITLE2,
+    titleImg,
+    titleDotImg,
+    0,
+    centerY,
+    width,
+    centerY,
+    width - mouseX,
+    height - LOWER_OFFSET_Y
+  );
 
   pop();
 };
-
-// 画像
-/**  @type {import("p5").Image} */
-let room;
-/**  @type {import("p5").Image} */
-let pic;
-/**  @type {import("p5").Image} */
-let ring;
-
-function preload() {
-  room = loadImage('room.png'); // loadImage('https://pbs.twimg.com/media/FL9W_EQaQAIegtS?format=jpg'); // see https://twitter.com/infowssJP/status/1495276417390907395
-  pic = loadImage('pic.png'); // インターネットやめろジェネレーター @inonote https://inonote.jp/generator/yamero/ 使用書體 M+ Rounded 1c
-  ring = loadImage('ring.png'); // 文字盤
-}
 
 // クリック判定
 let isMousePressed = false;

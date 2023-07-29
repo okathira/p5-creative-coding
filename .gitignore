@@ -159,7 +159,4 @@ dist
 # .pnp.*
 
 # End of https://www.toptal.com/developers/gitignore/api/yarn,node
-
-src/pic.png
-src/ring.png
-src/room.png
+src/img/*

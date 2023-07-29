@@ -1,10 +1,12 @@
 // inspired by: INTERNET OVERDOSE https://www.youtube.com/watch?v=Ti4K8uuiLZ0
 // NEEDY GIRL OVERDOSE https://store.steampowered.com/app/1451940/NEEDY_GIRL_OVERDOSE
 //
-// set pic.png, ring.png, room.psd -> room.png
+// set pic.png, room.psd -> room.png
 
 const FPS = 30;
 
+const ROOM_SRC = './img/room.png';
+const PIC_SRC = './img/pic.jpg';
 // heart bubble
 // reference: p5.js　バブルアップ - techtyの日記 https://techty.hatenablog.com/entry/2019/05/07/164956
 
@@ -105,13 +107,10 @@ const drawHearts = () => {
 let room;
 /**  @type {import("p5").Image} */
 let pic;
-/**  @type {import("p5").Image} */
-let ring;
 
 function preload() {
-  room = loadImage('room.png'); // loadImage('https://pbs.twimg.com/media/FL9W_EQaQAIegtS?format=jpg'); // see https://twitter.com/infowssJP/status/1495276417390907395
-  pic = loadImage('pic.png'); // インターネットやめろジェネレーター @inonote https://inonote.jp/generator/yamero/ 使用書體 M+ Rounded 1c
-  ring = loadImage('ring.png'); // 文字盤
+  room = loadImage(ROOM_SRC); // loadImage('https://pbs.twimg.com/media/FL9W_EQaQAIegtS?format=jpg'); // see https://twitter.com/infowssJP/status/1495276417390907395
+  pic = loadImage(PIC_SRC);
 }
 
 // rainbow title
@@ -121,6 +120,7 @@ function preload() {
 let dotCanvas;
 /** @type {import("p5").Image} */
 let titleFillImg;
+
 const TITLE1 = 'INTERNET';
 const TITLE2 = "DON'DOSE";
 const UPPER_OFFSET_Y = 110;
@@ -191,7 +191,7 @@ const initMain = () => {
   // 文字で虹をマスク
   const titleImg = titleCanvas.get();
   const rainbowImg = rainbowCanvas.get();
-  rainbowImg.mask(titleImg);
+  rainbowImg.mask(titleImg); // TODO: Imageにせず、canvasのglobalCompositeOperationに"source-atop"を使うと一つのcanvasで済むか確認する
   titleFillImg = rainbowImg;
 
   // 白ドット
@@ -231,12 +231,12 @@ const drawTitleImg = (titleImg, x, y, w, h, offsetX) => {
  */
 const createTitleDotImg = (titleImg) => {
   const titleDotImg = dotCanvas.get();
-  titleDotImg.mask(titleImg); // TODO: 重そうなのでいい方法を考える
+  titleDotImg.mask(titleImg); // TODO: 重そうなのでいい方法を考える drawingContext.globalCompositeOperation = "source-atop"？
 
   return titleDotImg;
 };
 
-//  TODO:  画像のコピーに必要な座標とテキストの描画に必要な座標とで、２つの座標が存在してしまっているのをなおす。
+//  TODO:  画像のコピーに必要な座標とテキストの描画に必要な座標とで、２つの座標が存在してしまっているのをなおす？
 /** タイトルを描画する
  * @param {string} titleText
  * @param {number} x
@@ -262,7 +262,19 @@ const drawTitle = (titleText, x, y, w, h, textX, textY) => {
   image(titleImg, x, y, w, h, 0, 0, w, h);
   image(titleDotImg, x, y, w, h, 0, 0, w, h);
   pop();
+  // タイトルの白枠線を描画する
   drawingContext.strokeText(titleText, textX, textY, TITLE_WIDTH);
+};
+
+/** picを円形に切り抜いて描画する
+ */
+const drawPic = () => {
+  push();
+  noStroke();
+  ellipse(0, 0, pic.height);
+  drawingContext.clip();
+  image(pic, 0, 0);
+  pop();
 };
 
 /** 中央のコンテンツを描画する
@@ -275,9 +287,9 @@ const drawCenterContent = (x, y, rad) => {
   push();
   imageMode(CENTER);
   translate(x, y);
-  image(pic, 0, 0);
-  rotate(rad);
-  image(ring, 0, 0);
+
+  drawPic();
+
   pop();
 };
 
@@ -299,7 +311,7 @@ const drawMain = () => {
   drawTitle(TITLE1, 0, 0, width, centerY, mouseX, UPPER_OFFSET_Y);
 
   // 中央のコンテンツ
-  drawCenterContent(centerX, centerY - 10, (-frameCount * 0.01 * 60) / FPS);
+  drawCenterContent(centerX, centerY, (-frameCount * 0.01 * 60) / FPS);
 
   // タイトル下部
   drawTitle(
@@ -342,10 +354,12 @@ function setup() {
   const mainCanvas = createCanvas(720, 540);
   mainCanvas.parent('main');
 
+  const picSize = height * 0.5;
+
   room.resize((room.width * height) / room.height, height); // width, (room.height * width) / room.width;
-  const picRatio = 0.625;
-  pic.resize(pic.width * picRatio, pic.height * picRatio);
-  ring.resize(ring.width * picRatio, ring.height * picRatio);
+  pic.resize(picSize, picSize);
+  console.log(room.width, room.height);
+  console.log(pic.width, pic.height);
 
   initHearts();
   initMain();

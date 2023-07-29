@@ -130,6 +130,9 @@ const TITLE_SIZE = 240;
 const TITLE_WIDTH = 660;
 const STROKE_WEIGHT = 8;
 
+const LINE_TEXT_1 = 'インターネット';
+const LINE_TEXT_2 = 'やめろ';
+
 const initMain = () => {
   const centerX = width / 2;
   const centerY = height / 2;
@@ -277,18 +280,155 @@ const drawPic = () => {
   pop();
 };
 
+const dialCW = 1; // -1で文字の向きと回転を逆にする
+const dialText = LINE_TEXT_1 + LINE_TEXT_2;
+const dialTextRepeat = 6;
+const dialFontSize = 16;
+const dialBgWidth = dialFontSize * 1.7;
+const dialTextAll = Array.from(dialText.repeat(dialTextRepeat));
+const dialFontColor = '#ffffff';
+const dialBgColor = 'rgb(20, 200, 240)';
+
+/** 回転する文字盤を描画する
+ * @param {number} frame
+ */
+const drawDial = (frame) => {
+  const dialDiameter = height / 2 + dialBgWidth / 2;
+  const dialDeltaRad = TWO_PI / dialTextAll.length;
+
+  textAlign(CENTER, CENTER);
+  textSize(dialFontSize);
+  textFont('Zen Maru Gothic');
+
+  // 文字盤の背景
+  push();
+  noFill();
+  stroke(dialBgColor);
+  strokeWeight(dialBgWidth);
+  circle(0, 0, dialDiameter);
+  pop();
+
+  // 文字を描画
+  push();
+  fill(dialFontColor);
+  noStroke();
+  rotate(frame * 0.02 * dialCW);
+  Array.from(dialText.repeat(dialTextRepeat)).forEach((char) => {
+    rotate(-dialDeltaRad * dialCW);
+    // 中心から半径分移動したところに一文字描く
+    text(char, 0, (dialDiameter / 2) * dialCW);
+  });
+  pop();
+};
+
+/** テキストに影をつけて描画する
+ * @param {string} textLine
+ * @param {number} x
+ * @param {number} y
+ * @param {number} stringWidth
+ */
+const drawCenterTextLine = (textLine, x, y, stringWidth) => {
+  const shadowOffsetX = 2;
+  const shadowOffsetY = 5;
+
+  push();
+  // 影白ブラー
+  drawingContext.shadowColor = 'white';
+  drawingContext.shadowBlur = 25;
+
+  // 影白塗りつぶし
+  fill(255, 255, 255, 192);
+  drawingContext.fillText(
+    textLine,
+    x + shadowOffsetX,
+    y + shadowOffsetY,
+    stringWidth
+  );
+
+  // 影枠
+  drawingContext.strokeText(
+    textLine,
+    x + shadowOffsetX,
+    y + shadowOffsetY,
+    stringWidth
+  );
+
+  pop();
+
+  // 本体
+  drawingContext.fillText(textLine, x, y, stringWidth);
+};
+
+/** 中央のコンテンツに乗せるテキストを描画する
+ * @param {number} x
+ * @param {number} y
+ * @param {number} frame
+ */
+const drawCenterTexts = (x, y, frame) => {
+  const fontSize = 48;
+  const fontStrokeWeight = 2;
+  const stringWidthRate = fontSize * 0.7;
+
+  push();
+
+  // picに対する文字列の座標
+  translate(x, y);
+
+  const colorRotate = frame * 4.75;
+  const gradSize = (width / 2) * 0.75;
+
+  // 文字色グラデーション
+  const grad = drawingContext.createLinearGradient(-gradSize, 0, gradSize, 0);
+  grad.addColorStop(0, `hsl(${colorRotate + 360}, 100%, 50%)`);
+  grad.addColorStop(1 / 12, `hsl(${colorRotate + 300}, 100%, 50%)`);
+  grad.addColorStop(2 / 12, `hsl(${colorRotate + 240}, 100%, 50%)`);
+  grad.addColorStop(3 / 12, `hsl(${colorRotate + 180}, 100%, 50%)`);
+  grad.addColorStop(4 / 12, `hsl(${colorRotate + 120}, 100%, 50%)`);
+  grad.addColorStop(5 / 12, `hsl(${colorRotate + 60}, 100%, 50%)`);
+  grad.addColorStop(6 / 12, `hsl(${colorRotate + 0}, 100%, 50%)`);
+
+  grad.addColorStop(7 / 12, `hsl(${colorRotate + 300}, 100%, 50%)`);
+  grad.addColorStop(8 / 12, `hsl(${colorRotate + 240}, 100%, 50%)`);
+  grad.addColorStop(9 / 12, `hsl(${colorRotate + 180}, 100%, 50%)`);
+  grad.addColorStop(10 / 12, `hsl(${colorRotate + 120}, 100%, 50%)`);
+  grad.addColorStop(11 / 12, `hsl(${colorRotate + 60}, 100%, 50%)`);
+  grad.addColorStop(1, `hsl(${colorRotate + 0}, 100%, 50%)`);
+  drawingContext.fillStyle = grad;
+  drawingContext.strokeStyle = grad;
+
+  // 描画設定
+  textSize(fontSize);
+  textStyle(BOLDITALIC);
+  textAlign(CENTER, TOP);
+  strokeWeight(fontStrokeWeight);
+  textFont("'M PLUS Rounded 1c'");
+
+  // 描画
+  drawCenterTextLine(LINE_TEXT_1, 0, 0, LINE_TEXT_1.length * stringWidthRate);
+  drawCenterTextLine(
+    LINE_TEXT_2,
+    0,
+    fontSize,
+    LINE_TEXT_2.length * stringWidthRate
+  );
+
+  pop();
+};
+
 /** 中央のコンテンツを描画する
  * @param {number} x
  * @param {number} y
- * @param {number} rad
+ * @param {number} frame
  */
-const drawCenterContent = (x, y, rad) => {
+const drawCenterContent = (x, y, frame) => {
   // 画像
   push();
   imageMode(CENTER);
   translate(x, y);
 
   drawPic();
+  drawDial(frame);
+  drawCenterTexts(0, 10, frame);
 
   pop();
 };
@@ -311,7 +451,7 @@ const drawMain = () => {
   drawTitle(TITLE1, 0, 0, width, centerY, mouseX, UPPER_OFFSET_Y);
 
   // 中央のコンテンツ
-  drawCenterContent(centerX, centerY, (-frameCount * 0.01 * 60) / FPS);
+  drawCenterContent(centerX, centerY - 20, frameCount * (60 / FPS));
 
   // タイトル下部
   drawTitle(
@@ -358,8 +498,6 @@ function setup() {
 
   room.resize((room.width * height) / room.height, height); // width, (room.height * width) / room.width;
   pic.resize(picSize, picSize);
-  console.log(room.width, room.height);
-  console.log(pic.width, pic.height);
 
   initHearts();
   initMain();

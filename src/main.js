@@ -489,6 +489,10 @@ let anyKeyPressed = false;
 
 function keyPressed() {
   anyKeyPressed = true;
+  // 画像を保存し、端末にダウンロードされる
+  if (key === 's') {
+    saveCanvas('myCanvas' + frameCount, 'png');
+  }
 }
 
 function keyReleased() {

@@ -216,6 +216,7 @@ const initMain = () => {
   rainbowCanvas.remove();
 };
 
+// 動作時間 7.0%
 /** タイトルを画像に書き込む
  * @param {import("p5").Image} titleImg
  * @param {number} x
@@ -225,15 +226,19 @@ const initMain = () => {
  * @param {number} offsetX
  */
 const drawTitleImg = (titleImg, x, y, w, h, offsetX) => {
-  titleImg.copy(titleFillImg, x, y, w, h, offsetX, 0, w, h);
+  titleImg.copy(titleFillImg, x, y, w, h, offsetX, 0, w, h); // ここの内部で呼ばれている getImageData() が2番めに重め
 };
 
+// 動作時間 31.3% !!
 /** 文字のドット画像を生成する
  * @param {import("p5").Image} titleImg
  * @returns {import("p5").Image}
  */
 const createTitleDotImg = (titleImg) => {
   const titleDotImg = dotCanvas.get();
+  // ↑ここの内部で呼ばれている getImageData() が一番重い
+  // willReadFrequently はp5.jsでは対応していないっぽい https://stackoverflow.com/questions/75489567/how-to-set-canvas-attributes-from-p5-js
+  // しかも、willReadFrequently は CPU で操作するようになるらしい https://github.com/processing/p5.js/issues/5840
   titleDotImg.mask(titleImg); // TODO: 重そうなのでいい方法を考える drawingContext.globalCompositeOperation = "source-atop"？
 
   return titleDotImg;
@@ -433,6 +438,7 @@ const drawCenterContent = (x, y, frame) => {
   pop();
 };
 
+// 動作時間 42.2%
 const drawMain = () => {
   const centerX = width / 2;
   const centerY = height / 2;

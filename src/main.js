@@ -117,9 +117,11 @@ function preload() {
 // font: Kanit https://github.com/cadsondemak/kanit/blob/master/OFL.txt
 
 /**  @type {import("p5").Graphics} */
-let dotCanvas;
-/** @type {import("p5").Image} */
-let titleFillImg;
+let dotGraphics;
+/** @type {import("p5").Graphics} */
+let titleFillGraphics;
+/**  @type {import("p5").Graphics} */
+let titleGraphics;
 
 const TITLE1 = 'INTERNET';
 const TITLE2 = "DON'DOSE";
@@ -192,56 +194,77 @@ const initMain = () => {
   titleCanvas.noErase();
 
   // 文字で虹をマスク
-  const titleImg = titleCanvas.get();
-  const rainbowImg = rainbowCanvas.get();
-  rainbowImg.mask(titleImg); // TODO: Imageにせず、canvasのglobalCompositeOperationに"source-atop"を使うと一つのcanvasで済むか確認する
-  titleFillImg = rainbowImg;
+  titleFillGraphics = createGraphics(width, height);
+  titleFillGraphics.image(titleCanvas, 0, 0);
+  titleFillGraphics.drawingContext.globalCompositeOperation = 'source-in';
+  titleFillGraphics.image(rainbowCanvas, 0, 0);
 
   // 白ドット
-  dotCanvas = createGraphics(width, centerY);
-  dotCanvas.fill('#fff');
-  dotCanvas.noStroke();
+  dotGraphics = createGraphics(width, height);
+  dotGraphics.fill('#fff');
+  dotGraphics.noStroke();
   for (let x = 0; x < width; x += 8) {
     for (let y = 0; y < height; y += 4) {
       if (y % 8) {
-        dotCanvas.ellipse(x, y, 3.25);
+        dotGraphics.ellipse(x, y, 3.25);
       } else {
-        dotCanvas.ellipse(x + 4, y, 3.25);
+        dotGraphics.ellipse(x + 4, y, 3.25);
       }
     }
   }
+
+  // タイトルのを書くための画像データを作成する
+  titleGraphics = createGraphics(width, height);
 
   // 不要なキャンバスを削除
   titleCanvas.remove();
   rainbowCanvas.remove();
 };
 
-// 動作時間 7.0%
 /** タイトルを画像に書き込む
- * @param {import("p5").Image} titleImg
- * @param {number} x
- * @param {number} y
- * @param {number} w
- * @param {number} h
+ * @param {import("p5").Graphics} titleGraphics
  * @param {number} offsetX
  */
-const drawTitleImg = (titleImg, x, y, w, h, offsetX) => {
-  titleImg.copy(titleFillImg, x, y, w, h, offsetX, 0, w, h); // ここの内部で呼ばれている getImageData() が2番めに重め
+const drawTitlesImg = (titleGraphics, offsetX) => {
+  const centerY = height / 2;
+
+  // 上
+  titleGraphics.image(
+    titleFillGraphics,
+    offsetX,
+    0,
+    width,
+    centerY,
+    0,
+    0,
+    width,
+    centerY
+  );
+  // 下
+  titleGraphics.image(
+    titleFillGraphics,
+    -offsetX,
+    centerY,
+    width,
+    centerY,
+    0,
+    centerY,
+    width,
+    centerY
+  );
 };
 
-// 動作時間 31.3% !!
-/** 文字のドット画像を生成する
- * @param {import("p5").Image} titleImg
- * @returns {import("p5").Image}
+/** メインキャンバスに書き込むタイトルを準備する
+ * @param {number} offsetX
  */
-const createTitleDotImg = (titleImg) => {
-  const titleDotImg = dotCanvas.get();
-  // ↑ここの内部で呼ばれている getImageData() が一番重い
-  // willReadFrequently はp5.jsでは対応していないっぽい https://stackoverflow.com/questions/75489567/how-to-set-canvas-attributes-from-p5-js
-  // しかも、willReadFrequently は CPU で操作するようになるらしい https://github.com/processing/p5.js/issues/5840
-  titleDotImg.mask(titleImg); // TODO: 重そうなのでいい方法を考える drawingContext.globalCompositeOperation = "source-atop"？
-
-  return titleDotImg;
+const prepareTitleGraphics = (offsetX) => {
+  titleGraphics.clear(255, 255, 255, 255);
+  // 画像にタイトルを書き込む
+  titleGraphics.drawingContext.globalCompositeOperation = 'source-over';
+  drawTitlesImg(titleGraphics, offsetX);
+  // タイトルのドット画像を生成する
+  titleGraphics.drawingContext.globalCompositeOperation = 'source-atop';
+  titleGraphics.image(dotGraphics, 0, 0);
 };
 
 //  TODO:  画像のコピーに必要な座標とテキストの描画に必要な座標とで、２つの座標が存在してしまっているのをなおす？
@@ -254,21 +277,10 @@ const createTitleDotImg = (titleImg) => {
  * @param {number} textX
  * @param {number} textY
  */
-const drawTitle = (titleText, x, y, w, h, textX, textY) => {
-  const centerX = w / 2;
-
-  // タイトルを書くための画像データを作成する
-  const titleImg = createImage(w, h);
-  // 画像にタイトルを書き込む
-  drawTitleImg(titleImg, x, y, w, h, textX - centerX);
-  // タイトルのドット画像を生成する
-  const titleDotImg = createTitleDotImg(titleImg);
-  // TODO: ここまでの処理を効率化できないか考える
-
+const drawTitleLine = (titleText, x, y, w, h, textX, textY) => {
   push();
   blendMode(HARD_LIGHT);
-  image(titleImg, x, y, w, h, 0, 0, w, h);
-  image(titleDotImg, x, y, w, h, 0, 0, w, h);
+  image(titleGraphics, x, y, w, h, x, y, w, h);
   pop();
   // タイトルの白枠線を描画する
   drawingContext.strokeText(titleText, textX, textY, TITLE_WIDTH);
@@ -438,7 +450,6 @@ const drawCenterContent = (x, y, frame) => {
   pop();
 };
 
-// 動作時間 42.2%
 const drawMain = () => {
   const centerX = width / 2;
   const centerY = height / 2;
@@ -453,14 +464,17 @@ const drawMain = () => {
   textFont(TITLE_FONT);
   textSize(TITLE_SIZE);
 
+  // タイトルの塗りキャンバスを用意する
+  prepareTitleGraphics(mouseX - centerX);
+
   // タイトル上部
-  drawTitle(TITLE1, 0, 0, width, centerY, mouseX, UPPER_OFFSET_Y);
+  drawTitleLine(TITLE1, 0, 0, width, centerY, mouseX, UPPER_OFFSET_Y);
 
   // 中央のコンテンツ
   drawCenterContent(centerX, centerY - 20, frameCount * (60 / FPS));
 
   // タイトル下部
-  drawTitle(
+  drawTitleLine(
     TITLE2,
     0,
     centerY,
@@ -525,7 +539,7 @@ function draw() {
     }
 
     // なにか押すと表示
-    drawHearts();
-    drawMain();
+    drawHearts(); // 6.3%
+    drawMain(); // 3.0%
   }
 }

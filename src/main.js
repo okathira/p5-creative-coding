@@ -1,12 +1,17 @@
 // inspired by: INTERNET OVERDOSE https://www.youtube.com/watch?v=Ti4K8uuiLZ0
 // NEEDY GIRL OVERDOSE https://store.steampowered.com/app/1451940/NEEDY_GIRL_OVERDOSE
 //
-// set pic.png, room.psd -> room.png
 
 const FPS = 30;
 
-const ROOM_SRC = './img/room.png';
-const PIC_SRC = './img/pic.jpg';
+// 素材・文字設定
+const BG_SRC = './img/bg.png'; // 公式壁紙: https://twitter.com/infowssJP/status/1495276417390907395
+const PIC_SRC = './img/pic.png';
+const TITLE1 = 'INTERNET';
+const TITLE2 = "DON'DOSE";
+const DIAL_TEXT_1 = 'インターネット';
+const DIAL_TEXT_2 = 'やめろ';
+
 // heart bubble
 // reference: p5.js　バブルアップ - techtyの日記 https://techty.hatenablog.com/entry/2019/05/07/164956
 
@@ -104,12 +109,12 @@ const drawHearts = () => {
 
 // 画像
 /**  @type {import("p5").Image} */
-let room;
+let bg;
 /**  @type {import("p5").Image} */
 let pic;
 
 function preload() {
-  room = loadImage(ROOM_SRC); // loadImage('https://pbs.twimg.com/media/FL9W_EQaQAIegtS?format=jpg'); // see https://twitter.com/infowssJP/status/1495276417390907395
+  bg = loadImage(BG_SRC);
   pic = loadImage(PIC_SRC);
 }
 
@@ -123,17 +128,12 @@ let titleFillGraphics;
 /**  @type {import("p5").Graphics} */
 let titleGraphics;
 
-const TITLE1 = 'INTERNET';
-const TITLE2 = "DON'DOSE";
 const UPPER_OFFSET_Y = 110;
 const LOWER_OFFSET_Y = 70;
 const TITLE_FONT = 'Kanit';
 const TITLE_SIZE = 240;
 const TITLE_WIDTH = 660;
 const STROKE_WEIGHT = 8;
-
-const LINE_TEXT_1 = 'インターネット';
-const LINE_TEXT_2 = 'やめろ';
 
 const initMain = () => {
   const centerX = width / 2;
@@ -298,10 +298,10 @@ const drawPic = () => {
 };
 
 const dialCW = 1; // -1で文字の向きと回転を逆にする
-const dialText = LINE_TEXT_1 + LINE_TEXT_2;
+const dialText = DIAL_TEXT_1 + DIAL_TEXT_2;
 const dialTextRepeat = 6;
 const dialFontSize = 16;
-const dialBgWidth = dialFontSize * 1.7;
+const dialBgWidth = dialFontSize * 1.5;
 const dialTextAll = Array.from(dialText.repeat(dialTextRepeat));
 const dialFontColor = '#ffffff';
 const dialBgColor = 'rgb(20, 200, 240)';
@@ -421,12 +421,12 @@ const drawCenterTexts = (x, y, frame) => {
   textFont("'M PLUS Rounded 1c'");
 
   // 描画
-  drawCenterTextLine(LINE_TEXT_1, 0, 0, LINE_TEXT_1.length * stringWidthRate);
+  drawCenterTextLine(DIAL_TEXT_1, 0, 0, DIAL_TEXT_1.length * stringWidthRate);
   drawCenterTextLine(
-    LINE_TEXT_2,
+    DIAL_TEXT_2,
     0,
     fontSize,
-    LINE_TEXT_2.length * stringWidthRate
+    DIAL_TEXT_2.length * stringWidthRate
   );
 
   pop();
@@ -520,7 +520,7 @@ function setup() {
 
   const picSize = height * 0.5;
 
-  room.resize((room.width * height) / room.height, height); // width, (room.height * width) / room.width;
+  bg.resize((bg.width * height) / bg.height, height); // width, (bg.height * width) / bg.width;
   pic.resize(picSize, picSize);
 
   initHearts();
@@ -530,7 +530,7 @@ function setup() {
 let hasInitialized = false;
 
 function draw() {
-  image(room, 0, 0);
+  image(bg, 0, 0);
 
   if (isMousePressed || anyKeyPressed) {
     if (!hasInitialized) {

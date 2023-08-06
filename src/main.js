@@ -5,7 +5,7 @@
 const FPS = 30;
 
 // 素材・文字設定
-const BG_SRC = './img/bg.png'; // 公式壁紙: https://twitter.com/infowssJP/status/1495276417390907395
+const BG_SRC = './img/bg.jpg'; // 公式壁紙: https://twitter.com/infowssJP/status/1495276417390907395
 const PIC_SRC = './img/pic.png';
 const TITLE1 = 'INTERNET';
 const TITLE2 = "DON'DOSE";
@@ -127,6 +127,8 @@ let dotGraphics;
 let titleFillGraphics;
 /**  @type {import("p5").Graphics} */
 let titleGraphics;
+/**  @type {import("p5").Graphics} */
+let centerPicGraphics;
 
 const UPPER_OFFSET_Y = 110;
 const LOWER_OFFSET_Y = 70;
@@ -213,8 +215,17 @@ const initMain = () => {
     }
   }
 
-  // タイトルのを書くための画像データを作成する
+  // タイトルを書くための画像データを作成する
   titleGraphics = createGraphics(width, height);
+
+  // 真ん中の画像用
+  centerPicGraphics = createGraphics(width, height);
+  centerPicGraphics.imageMode(CENTER);
+  centerPicGraphics.translate(centerX, centerY);
+  centerPicGraphics.noStroke();
+  centerPicGraphics.image(pic, 0, 0);
+  centerPicGraphics.drawingContext.globalCompositeOperation = 'destination-in';
+  centerPicGraphics.ellipse(0, 0, pic.height);
 
   // 不要なキャンバスを削除
   titleCanvas.remove();
@@ -289,12 +300,7 @@ const drawTitleLine = (titleText, x, y, w, h, textX, textY) => {
 /** picを円形に切り抜いて描画する
  */
 const drawPic = () => {
-  push();
-  noStroke();
-  ellipse(0, 0, pic.height);
-  drawingContext.clip();
-  image(pic, 0, 0);
-  pop();
+  image(centerPicGraphics, 0, 0);
 };
 
 const dialCW = 1; // -1で文字の向きと回転を逆にする

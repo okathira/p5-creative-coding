@@ -1,6 +1,7 @@
 // ref:
 // https://itp-xstory.github.io/p5js-shaders
 // https://github.com/aferriss/p5jsShaderExamples
+// https://www.youtube.com/watch?v=f4s1h2YETNY // current
 
 /**
  * @type {import("p5").Shader}
@@ -14,7 +15,7 @@ function preload() {
 function setup() {
   pixelDensity(1);
   frameRate(60);
-  createCanvas(500, 500, WEBGL);
+  createCanvas(640, 640, WEBGL);
 
   // noStroke();
 }
@@ -22,6 +23,7 @@ function setup() {
 function draw() {
   theShader.setUniform('resolution', [width, height]);
   theShader.setUniform('mousePos', [mouseX, mouseY]);
+  theShader.setUniform('frame', [frameCount]);
 
   shader(theShader);
 

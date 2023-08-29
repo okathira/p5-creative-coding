@@ -15,7 +15,7 @@ function preload() {
 function setup() {
   pixelDensity(1);
   frameRate(60);
-  createCanvas(640, 640, WEBGL);
+  createCanvas(windowWidth, windowHeight, WEBGL);
 
   // noStroke();
 }

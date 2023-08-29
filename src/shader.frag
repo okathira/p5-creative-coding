@@ -18,7 +18,8 @@ vec3 palette(float t){
 
 void main() {
   vec2 mouse = vec2(mousePos.x / resolution.x, mousePos.y / resolution.y) * 2.0 - 1.0;
-  mouse = vec2(-mouse.y, mouse.x);
+	mouse.x *= resolution.x / resolution.y; // keep ratio
+  mouse = vec2(-mouse.y, mouse.x); // 3d座標に向きを合わせる
 
   float time = frame / 60.0;
 

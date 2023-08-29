@@ -13,7 +13,7 @@ vec3 palette(float t){
   vec3 c = v3 * 1.2;
   vec3 d = vec3(0.0, 1./3., 2./3.);
 
-  return a + b*cos(3.14159*2.0*(c*t + d));
+  return a + b*cos(3.14159*2.5*(c*t + d));
 }
 
 void main() {

@@ -8,6 +8,8 @@
  */
 let theShader;
 
+let animFrame = 0;
+
 function preload() {
   theShader = loadShader('./shader.vert', './shader.frag');
 }
@@ -23,7 +25,7 @@ function setup() {
 function draw() {
   theShader.setUniform('resolution', [width, height]);
   theShader.setUniform('mousePos', [mouseX, mouseY]);
-  theShader.setUniform('frame', [frameCount]);
+  theShader.setUniform('frame', [animFrame]);
 
   shader(theShader);
 
@@ -31,4 +33,10 @@ function draw() {
   quad(-1, -1, -1, 1, 1, 1, 1, -1);
 
   resetShader();
+
+  if (!mouseIsPressed) {
+    animFrame += 1;
+  } else {
+    animFrame += -2;
+  }
 }

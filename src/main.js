@@ -1,20 +1,29 @@
 /**
  * @typedef { import("p5").Font } Font
  *
+ * @typedef {Object} Entry
+ * @property {number} step
+ * @property {number} x
+ * @property {number} y
+ * @property {number} rot
+ *
  * @typedef {{
  *  chrs: string
- *  entryStep: number
+ *  entry: Entry
  *  letterAnimParamsList: AnimParam[][]
  *  lineAnimParams: AnimParam[]
  * }} TextLine
  *
- * @typedef {Object} AnimParam
- * @property {number=} x
- * @property {number=} y
- * @property {number=} rot
- * @property {number=} rotX
- * @property {number=} rotY
- * @property {EasingFuncName | EasingNoneName} easing
+ * @typedef {{
+ *  x?: number
+ *  y?: number
+ *  rot?: number
+ *  rotX?: number
+ *  rotY?: number
+ *  easing: EasingFuncName
+ * } | {
+ *  easing: EasingNoneName
+ * }} AnimParam
  */
 
 const TEMPO = 17.5;
@@ -48,11 +57,10 @@ const easingFuncList = {
 /**
  * @type {(t: number, param: AnimParam) => void}
  */
-const animLineFunc = (
-  t,
-  { x = 0, y = 0, rot = 0, rotX = 0, rotY = 0, easing }
-) => {
-  if (easing === 'none') return;
+const animLineFunc = (t, param) => {
+  if (param.easing === 'none') return;
+
+  const { x = 0, y = 0, rot = 0, rotX = 0, rotY = 0, easing } = param;
 
   const easedTime = easingFuncList[easing](t);
 
@@ -71,7 +79,7 @@ const animLineFunc = (
 const textLines = [
   {
     chrs: '<私は>',
-    entryStep: 0,
+    entry: { step: 0, x: 0, y: 0, rot: 0 },
     letterAnimParamsList: [
       [{ easing: 'none' }],
       [{ easing: 'easeLinear', y: 40 }],
@@ -82,6 +90,16 @@ const textLines = [
       { rot: 10, rotX: -100, easing: 'easeOutCubic' },
       { rot: -30, rotX: -100, rotY: 50, easing: 'easeOutCubic' },
     ],
+  },
+  {
+    chrs: '集積の',
+    entry: { step: 1, x: 60, y: 60, rot: 0 },
+    letterAnimParamsList: [
+      [{ easing: 'easeLinear', y: 40 }],
+      [{ easing: 'none' }],
+      [{ easing: 'none' }],
+    ],
+    lineAnimParams: [{ rot: 10, rotX: 200, easing: 'easeOutCubic' }],
   },
 ];
 
@@ -115,12 +133,17 @@ function draw() {
   background('#5a1212');
 
   textLines.map((line) => {
-    const { chrs, entryStep, letterAnimParamsList, lineAnimParams } = line;
+    const { chrs, entry, letterAnimParamsList, lineAnimParams } = line;
     const t = frame / TEMPO;
+
+    const step = Math.floor(t - entry.step);
+    if (step < 0) return;
 
     push();
 
-    const step = Math.trunc(t - entryStep);
+    // 初期値
+    translate(entry.x, entry.y);
+    rotateZ(entry.rot);
 
     // 文字の行にかかるアニメーション
     lineAnimParams.map((lineAnimParam, i) => {
@@ -137,7 +160,7 @@ function draw() {
     // それぞれの文字の座標を計算
     const chrArray = [...chrs];
     const chrNum = chrArray.length;
-    const spacingX = 50;
+    const spacingX = 60;
     const centeringX = (spacingX * (chrNum - 1)) / 2;
 
     if (chrNum !== letterAnimParamsList.length)

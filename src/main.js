@@ -112,7 +112,7 @@ function draw() {
     frame = 0;
   }
 
-  background('#501010');
+  background('#5a1212');
 
   textLines.map((line) => {
     const { chrs, entryStep, letterAnimParamsList, lineAnimParams } = line;

@@ -27,7 +27,7 @@
  * }} AnimParam
  */
 
-const BEAT_TIME = 256;
+const BEAT_TIME = 380;
 
 /**
  * @typedef {(t: number) => number} EasingFunc
@@ -153,22 +153,22 @@ const interact = () => {
   let factor = 1;
 
   if (keyIsPressed) {
-    // Space が押されている間時間をとめる
-    if (keyIsDown(32)) {
-      return;
-    }
-
     // Enter で最初から
     if (keyIsDown(ENTER)) {
       elapsedTime = 0;
       return;
     }
 
+    // Space が押されている間時間をとめる
+    if (keyIsDown(32)) {
+      return;
+    }
+
     if (keyIsDown(SHIFT)) {
-      factor = 10;
+      factor = 4;
     }
     if (keyIsDown(CONTROL)) {
-      factor = 0.1;
+      factor = 0.25;
     }
 
     if (keyIsDown(LEFT_ARROW)) {

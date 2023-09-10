@@ -1,5 +1,6 @@
 /**
  * @typedef { import("p5").Font } Font
+ * @typedef { import("p5").Element } P5Element
  *
  * @typedef {Object} Entry
  * @property {number} step
@@ -26,7 +27,7 @@
  * }} AnimParam
  */
 
-const TEMPO = 17.5;
+const BEAT_TIME = 256;
 
 /**
  * @typedef {(t: number) => number} EasingFunc
@@ -99,7 +100,7 @@ const textLines = [
       [{ easing: 'none' }],
       [{ easing: 'none' }],
     ],
-    lineAnimParams: [{ rot: 10, rotX: 200, easing: 'easeOutCubic' }],
+    lineAnimParams: [{ rot: 10, rotX: 150, easing: 'easeOutCubic' }],
   },
 ];
 
@@ -112,6 +113,11 @@ function preload() {
   font = loadFont('./font/NotoSerifJP-Bold.otf');
 }
 
+/**
+ * @type {P5Element}
+ */
+let pElement;
+
 function setup() {
   createCanvas(750, 500, WEBGL);
   frameRate(60);
@@ -121,20 +127,65 @@ function setup() {
   textAlign(CENTER, CENTER);
   textSize(20);
 
+  pElement = createP('info text');
+  pElement.position(0, 0);
+
   angleMode(DEGREES);
 }
 
-let frame = 0;
-function draw() {
-  if (mouseIsPressed) {
-    frame = 0;
+let elapsedTime = 0;
+
+const interact = () => {
+  let additionalTime = 1;
+  let factor = 1;
+
+  if (keyIsPressed) {
+    // Space が押されている間時間をとめる
+    if (keyIsDown(32)) {
+      return;
+    }
+
+    // Enter で最初から
+    if (keyIsDown(ENTER)) {
+      elapsedTime = 0;
+      return;
+    }
+
+    if (keyIsDown(SHIFT)) {
+      factor = 10;
+    }
+    if (keyIsDown(CONTROL)) {
+      factor = 0.1;
+    }
+
+    if (keyIsDown(LEFT_ARROW)) {
+      additionalTime -= 1 + 1;
+    }
+    if (keyIsDown(RIGHT_ARROW)) {
+      additionalTime += 1;
+    }
+    if (keyIsDown(UP_ARROW)) {
+      additionalTime -= 10 + 1;
+    }
+    if (keyIsDown(DOWN_ARROW)) {
+      additionalTime += 10;
+    }
   }
 
+  elapsedTime += additionalTime * deltaTime * factor;
+  if (elapsedTime < 0) elapsedTime = 0;
+};
+
+function draw() {
   background('#5a1212');
+
+  interact();
+
+  pElement.html(`elapsedTime: ${elapsedTime}`);
 
   textLines.map((line) => {
     const { chrs, entry, letterAnimParamsList, lineAnimParams } = line;
-    const t = frame / TEMPO;
+    const t = elapsedTime / BEAT_TIME;
 
     const step = Math.floor(t - entry.step);
     if (step < 0) return;
@@ -189,6 +240,4 @@ function draw() {
 
     pop();
   });
-
-  frame += 1;
 }

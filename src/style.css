@@ -16,3 +16,8 @@ main {
 canvas {
   display: block;
 }
+
+p {
+  color: white;
+  font-size: x-large;
+}

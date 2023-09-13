@@ -7,6 +7,12 @@
  * @property {number} x
  * @property {number} y
  * @property {number} rot
+ * @property {Position[]=} chrs
+ *
+ * @typedef {Object} Position
+ * @property {number=} x
+ * @property {number=} y
+ * @property {number=} rot
  *
  * @typedef {{
  *  chrs: string
@@ -27,7 +33,7 @@
  * }} AnimParam
  */
 
-const BEAT_TIME = 380;
+const BEAT_TIME = 350;
 
 /**
  * @typedef {(t: number) => number} EasingFunc
@@ -65,13 +71,13 @@ const animLineFunc = (t, param) => {
 
   const easedTime = easingFuncList[easing](t);
 
+  translate(x * easedTime, y * easedTime);
+
   // 理論上は回転(rot)と平行移動(x, y)だけで表現できるが、利便性のために回転軸座標(rotX, rotY)ももたせる
   // translate(), rotate()が重そうなら、回転と平行移動のみに変換してぞれぞれ合計していくことで最後にまとめて処理できるはず
   translate(rotX, rotY);
   rotateZ(rot * easedTime);
   translate(-rotX, -rotY);
-
-  translate(x * easedTime, y * easedTime);
 };
 
 /**
@@ -194,6 +200,18 @@ function draw() {
       translate(spacingX * i - centeringX, 0);
 
       // それぞれの文字が個別に持つアニメーション
+
+      // 初期値
+      if (entry.chrs) {
+        if (chrNum !== entry.chrs.length)
+          throw new Error('chrNum !== entry.chrs.length');
+
+        const { x = 0, y = 0, rot = 0 } = entry.chrs[i];
+        translate(x, y);
+        rotateZ(rot);
+      }
+
+      // アニメーション
       const letterAnimParams = letterAnimParamsList[i];
       letterAnimParams.map((letterAnimParam, i) => {
         if (i < step) {

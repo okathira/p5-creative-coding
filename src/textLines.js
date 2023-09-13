@@ -14,7 +14,8 @@ const textLines = [
     lineAnimParams: [
       { rot: 10, rotX: -100, easing: 'easeOutCubic' },
       { rot: -35, rotX: -100, rotY: 40, easing: 'easeOutCubic' },
-      { rot: +35, rotX: 100, rotY: 40, easing: 'easeOutCubic' },
+      { rot: 35, rotX: 100, rotY: 40, easing: 'easeOutCubic' },
+      { rot: -30, rotX: 30, rotY: 50, easing: 'easeOutCubic' },
     ],
   },
   {
@@ -28,6 +29,7 @@ const textLines = [
     lineAnimParams: [
       { rot: 20, rotX: 100, easing: 'easeOutCubic' },
       { rot: -25, rotX: -150, rotY: 100, easing: 'easeOutCubic' },
+      { rot: 25, rotX: 0, rotY: 100, easing: 'easeOutCubic' },
     ],
   },
   {
@@ -37,6 +39,26 @@ const textLines = [
       [{ easing: 'easeLinear', y: 20 }],
       [{ easing: 'none' }],
     ],
-    lineAnimParams: [{ rot: -15, x: -50, y: -80, easing: 'easeOutCubic' }],
+    lineAnimParams: [
+      { rot: -15, x: -50, y: -80, easing: 'easeOutCubic' },
+      { rot: -55, rotX: -20, rotY: 50, easing: 'easeOutCubic' },
+    ],
+  },
+  {
+    chrs: '遊泳する',
+    entry: {
+      step: 3,
+      x: 180,
+      y: 120,
+      rot: 10,
+      chrs: [{ y: 5 }, { y: -5 }, {}, {}],
+    },
+    letterAnimParamsList: [
+      [{ easing: 'easeLinear', y: -50 }],
+      [{ easing: 'easeLinear', y: 15, rot: 25 }],
+      [{ easing: 'none' }],
+      [{ easing: 'none' }],
+    ],
+    lineAnimParams: [{ rot: -20, rotX: -80, rotY: 0, easing: 'easeOutCubic' }],
   },
 ];

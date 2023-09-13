@@ -40,8 +40,8 @@ const textLines = [
       [{ easing: 'none' }],
     ],
     lineAnimParams: [
-      { rot: -15, x: -50, y: -80, easing: 'easeOutCubic' },
-      { rot: -55, rotX: -20, rotY: 50, easing: 'easeOutCubic' },
+      { rot: -15, x: -65, y: -70, easing: 'easeOutCubic' },
+      { rot: -55, rotX: -20, rotY: 60, easing: 'easeOutCubic' },
     ],
   },
   {
@@ -49,9 +49,9 @@ const textLines = [
     entry: {
       step: 3,
       x: 180,
-      y: 120,
+      y: 110,
       rot: 10,
-      chrs: [{ y: 5 }, { y: -5 }, {}, {}],
+      chrs: [{ y: 5, size: 22 }, { y: -5, size: 22 }, {}, {}],
     },
     letterAnimParamsList: [
       [{ easing: 'easeLinear', y: -50 }],

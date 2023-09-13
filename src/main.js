@@ -7,12 +7,13 @@
  * @property {number} x
  * @property {number} y
  * @property {number} rot
- * @property {Position[]=} chrs
+ * @property {Letter[]=} chrs
  *
- * @typedef {Object} Position
+ * @typedef {Object} Letter
  * @property {number=} x
  * @property {number=} y
  * @property {number=} rot
+ * @property {number=} size
  *
  * @typedef {{
  *  chrs: string
@@ -34,6 +35,7 @@
  */
 
 const BEAT_TIME = 350;
+const DEFAULT_FONT_SIZE = 18;
 
 /**
  * @typedef {(t: number) => number} EasingFunc
@@ -101,7 +103,7 @@ function setup() {
   background(127);
   textFont(font);
   textAlign(CENTER, CENTER);
-  textSize(18);
+  textSize(DEFAULT_FONT_SIZE);
 
   pElement = createP('info text');
   pElement.position(0, 0);
@@ -206,7 +208,14 @@ function draw() {
         if (chrNum !== entry.chrs.length)
           throw new Error('chrNum !== entry.chrs.length');
 
-        const { x = 0, y = 0, rot = 0 } = entry.chrs[i];
+        const {
+          x = 0,
+          y = 0,
+          rot = 0,
+          size = DEFAULT_FONT_SIZE,
+        } = entry.chrs[i];
+
+        textSize(size);
         translate(x, y);
         rotateZ(rot);
       }
